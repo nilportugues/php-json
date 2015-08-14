@@ -84,8 +84,6 @@ class JsonTransformer extends Transformer
      */
     private function setResponseLinks(array &$response)
     {
-        // print_r($this->buildLinks());
-
         $links = array_filter(
             array_merge(
                 $this->buildLinks(),
