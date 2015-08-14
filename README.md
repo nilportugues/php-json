@@ -1,4 +1,4 @@
-# JSON API Transformer
+# JSON Transformer
 
 [![Build Status]
 (https://travis-ci.org/nilportugues/json-transformer.svg)]
