@@ -1,7 +1,7 @@
 {
     "name": "nilportugues/json",
     "type": "library",
-    "description": "JSON API transformer outputting valid API responses.",
+    "description": "JSON transformer outputting valid API responses.",
     "keywords": ["json", "api", "serializer", "transformer", "psr7", "response"],
     "homepage": "http://nilportugues.com",
     "license": "MIT",
@@ -14,6 +14,7 @@
     ],
     "require": {
         "php": ">=5.5.0",
+        "nilportugues/serializer": "dev-master",
         "nilportugues/api-transformer": "dev-master",
         "psr/http-message": "~1.0",
         "zendframework/zend-diactoros": "^1.1.0"
