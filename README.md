@@ -150,12 +150,12 @@ Calling the transformer will output a **valid JSON response** using the correct 
 ```php
 use NilPortugues\Api\Json\JsonTransformer;
 use NilPortugues\Api\Json\Http\Message\Response;
-use NilPortugues\Serializer\Serializer;
+use NilPortugues\Serializer\DeepCopySerializer;
 
 $transformer = new JsonTransformer($mapper);
 
 //Output transformation
-$serializer = new Serializer($transformer);
+$serializer = new DeepCopySerializer($transformer);
 $serializer->setSelfUrl('http://example.com/posts/9');
 $serializer->setNextUrl('http://example.com/posts/10');
 $serializer->addMeta('author',[['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
