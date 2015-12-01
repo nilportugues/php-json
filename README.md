@@ -1,4 +1,4 @@
-# JSON Transformer
+# JSON Schema Transformer
 
 [![Build Status](https://travis-ci.org/nilportugues/json-transformer.svg)]
 (https://travis-ci.org/nilportugues/json-transformer) 
