@@ -1,7 +1,7 @@
 # JSON Transformer
 
-[![Build Status](https://travis-ci.org/nilportugues/json-transformer.svg)]
-(https://travis-ci.org/nilportugues/json-transformer) 
+[![Build Status](https://travis-ci.org/nilportugues/php-json.svg)]
+(https://travis-ci.org/nilportugues/php-json) 
 [![Coverage Status](https://coveralls.io/repos/nilportugues/json-transformer/badge.svg?branch=master&service=github)]
 (https://coveralls.io/github/nilportugues/json-transformer?branch=master) 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nilportugues/json-transformer/badges/quality-score.png?b=master)]
