@@ -12,7 +12,7 @@
 (https://packagist.org/packages/nilportugues/json) 
 [![License](https://poser.pugx.org/nilportugues/json/license)]
 (https://packagist.org/packages/nilportugues/json) 
-
+[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://paypal.me/nilportugues)
 
 ## Installation
 
