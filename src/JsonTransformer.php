@@ -8,10 +8,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace NilPortugues\Api\Json;
 
-use NilPortugues\Api\Mapping\Mapper;
 use NilPortugues\Api\Transformer\Helpers\RecursiveDeleteHelper;
+use NilPortugues\Api\Transformer\Helpers\RecursiveFormatterHelper;
 use NilPortugues\Api\Transformer\Helpers\RecursiveRenamerHelper;
 use NilPortugues\Api\Transformer\Transformer;
 use NilPortugues\Serializer\Serializer;
@@ -23,16 +24,6 @@ class JsonTransformer extends Transformer
 {
     const META_KEY = 'meta';
     const LINKS = 'links';
-
-    /**
-     * @param Mapper $mapper
-     */
-    public function __construct(Mapper $mapper = null)
-    {
-        if (null !== $mapper) {
-            $this->mappings = $mapper->getClassMap();
-        }
-    }
 
     /**
      * @param mixed $value
@@ -86,6 +77,7 @@ class JsonTransformer extends Transformer
     {
         $links = array_filter(
             array_merge(
+                $this->buildSelfLink($response),
                 $this->buildLinks(),
                 $this->getResponseAdditionalLinks($response, $response[Serializer::CLASS_IDENTIFIER_KEY])
             )
@@ -94,5 +86,182 @@ class JsonTransformer extends Transformer
         if (!empty($links)) {
             $response[self::LINKS] = $this->addHrefToLinks($links);
         }
+    }
+
+    /**
+     * @param array $response
+     *
+     * @return array
+     */
+    protected function buildSelfLink(array &$response)
+    {
+        $link = [];
+
+        if (!empty($type = $response[Serializer::CLASS_IDENTIFIER_KEY])) {
+            list($idValues, $idProperties) = RecursiveFormatterHelper::getIdPropertyAndValues(
+                $this->mappings,
+                $response,
+                $type
+            );
+
+            $href = self::buildUrl(
+                $this->mappings,
+                $idProperties,
+                $idValues,
+                $this->mappings[$type]->getResourceUrl(),
+                $type
+            );
+
+            if ($href != $this->mappings[$type]->getResourceUrl()) {
+                $link[self::SELF_LINK] = $href;
+            }
+        }
+
+        return $link;
+    }
+
+    /**
+     * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
+     * @param                                     $idProperties
+     * @param                                     $idValues
+     * @param                                     $url
+     * @param                                     $type
+     *
+     * @return mixed
+     */
+    protected static function buildUrl(array &$mappings, $idProperties, $idValues, $url, $type)
+    {
+        $outputUrl = \str_replace($idProperties, $idValues, $url);
+
+        if ($outputUrl !== $url) {
+            return $outputUrl;
+        }
+
+        $outputUrl = self::secondPassBuildUrl([$mappings[$type]->getClassAlias()], $idValues, $url);
+
+        if ($outputUrl !== $url) {
+            return $outputUrl;
+        }
+
+        $className = $mappings[$type]->getClassName();
+        $className = \explode('\\', $className);
+        $className = \array_pop($className);
+
+        $outputUrl = self::secondPassBuildUrl([$className], $idValues, $url);
+        if ($outputUrl !== $url) {
+            return $outputUrl;
+        }
+
+        return $url;
+    }
+
+    /**
+     * @param $idPropertyName
+     * @param $idValues
+     * @param $url
+     *
+     * @return mixed
+     */
+    protected static function secondPassBuildUrl($idPropertyName, $idValues, $url)
+    {
+        if (!empty($idPropertyName)) {
+            $outputUrl = self::toCamelCase($idPropertyName, $idValues, $url);
+            if ($url !== $outputUrl) {
+                return $outputUrl;
+            }
+
+            $outputUrl = self::toLowerFirstCamelCase($idPropertyName, $idValues, $url);
+            if ($url !== $outputUrl) {
+                return $outputUrl;
+            }
+
+            $outputUrl = self::toUnderScore($idPropertyName, $idValues, $url);
+            if ($url !== $outputUrl) {
+                return $outputUrl;
+            }
+        }
+
+        return $url;
+    }
+
+    /**
+     * @param $original
+     * @param $idValues
+     * @param $url
+     *
+     * @return mixed
+     */
+    protected static function toCamelCase($original, $idValues, $url)
+    {
+        foreach ($original as &$o) {
+            $o = '{'.self::underscoreToCamelCase(self::camelCaseToUnderscore($o)).'}';
+        }
+
+        return \str_replace($original, $idValues, $url);
+    }
+
+    /**
+     * Converts a underscore string to camelCase.
+     *
+     * @param string $string
+     *
+     * @return string
+     */
+    protected static function underscoreToCamelCase($string)
+    {
+        return \str_replace(' ', '', \ucwords(\strtolower(\str_replace(['_', '-'], ' ', $string))));
+    }
+
+    /**
+     * Transforms a given string from camelCase to under_score style.
+     *
+     * @param string $camel
+     * @param string $splitter
+     *
+     * @return string
+     */
+    protected static function camelCaseToUnderscore($camel, $splitter = '_')
+    {
+        $camel = \preg_replace(
+            '/(?!^)[[:upper:]][[:lower:]]/',
+            '$0',
+            \preg_replace('/(?!^)[[:upper:]]+/', $splitter.'$0', $camel)
+        );
+
+        return \strtolower($camel);
+    }
+
+    /**
+     * @param $original
+     * @param $idValues
+     * @param $url
+     *
+     * @return mixed
+     */
+    protected static function toLowerFirstCamelCase($original, $idValues, $url)
+    {
+        foreach ($original as &$o) {
+            $o = self::underscoreToCamelCase(self::camelCaseToUnderscore($o));
+            $o[0] = \strtolower($o[0]);
+            $o = '{'.$o.'}';
+        }
+
+        return \str_replace($original, $idValues, $url);
+    }
+
+    /**
+     * @param $original
+     * @param $idValues
+     * @param $url
+     *
+     * @return mixed
+     */
+    protected static function toUnderScore($original, $idValues, $url)
+    {
+        foreach ($original as &$o) {
+            $o = '{'.self::camelCaseToUnderscore($o).'}';
+        }
+
+        return \str_replace($original, $idValues, $url);
     }
 }
