@@ -42,6 +42,25 @@ class JsonTransformer extends Transformer
      */
     protected function serialization($value)
     {
+        if (is_array($value) && !empty($value[Serializer::MAP_TYPE])) {
+            $data = [];
+            foreach ($value[Serializer::SCALAR_VALUE] as $v) {
+                $data[] = $this->serialization($v);
+            }
+        } else {
+            $data = $this->serializeObject($value);
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param array $value
+     *
+     * @return mixed
+     */
+    protected function serializeObject(array $value)
+    {
         if (null !== $this->mappings) {
             /** @var \NilPortugues\Api\Mapping\Mapping $mapping */
             foreach ($this->mappings as $class => $mapping) {

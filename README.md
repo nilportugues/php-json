@@ -148,18 +148,10 @@ $mapper = new Mapper($mappings);
 Calling the transformer will output a **valid JSON response** using the correct formatting:
 
 ```php
-use NilPortugues\Api\Json\JsonTransformer;
+use NilPortugues\Api\Json\JsonSerializer;
 use NilPortugues\Api\Json\Http\Message\Response;
-use NilPortugues\Serializer\DeepCopySerializer;
 
-$transformer = new JsonTransformer($mapper);
-
-//Output transformation
-$serializer = new DeepCopySerializer($transformer);
-$serializer->setSelfUrl('http://example.com/posts/9');
-$serializer->setNextUrl('http://example.com/posts/10');
-$serializer->addMeta('author',[['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
-
+$serializer = new JsonSerializer($mapper);
 $output = $serializer->serialize($post);
 
 //PSR7 Response with headers and content.
@@ -213,15 +205,12 @@ Content-type: application/json; charset=utf-8
         }
     ],
     "links": {
-        "self": {
-            "href": "http://localhost:8000/post/9"
-        },
-        "next": {
-            "href": "http://localhost:8000/post/10"
-        },
         "comments": {
             "href": "http://localhost:8000/post/9/comments"
-        }
+        },
+        "self": {
+            "href": "http://localhost:8000/post/9"
+        }        
     }
 }
 ```
