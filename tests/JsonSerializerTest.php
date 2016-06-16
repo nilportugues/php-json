@@ -64,44 +64,42 @@ class JsonSerializerTest extends \PHPUnit_Framework_TestCase
      */
     public function testItWillRenamePropertiesAndHideFromClass()
     {
-        $mappings = [
-            [
-                'class' => Post::class,
-                'alias' => 'Message',
-                'aliased_properties' => [
-                    'title' => 'headline',
-                    'content' => 'body',
-                ],
-                'hide_properties' => [
-                    'comments',
-                ],
-                'id_properties' => [
-                    'postId',
-                ],
-                'urls' => [
-                    // Mandatory
-                    'self' => 'http://example.com/posts/{postId}',
-                    // Optional
-                    'comments' => 'http://example.com/posts/{postId}/comments',
-                ],
-            ],
-        ];
+        $mappings = $this->mappings();
 
         $expected = <<<JSON
 {
-    "post_id": 9,
-    "headline": "Hello World",
-    "body": "Your first post",
-    "author": {
-        "user_id": 1,
-        "name": "Post Author"
-    },
-    "links": {
-        "comments": {"href": "http://example.com/posts/9/comments" },
-        "self": {"href": "http://example.com/posts/9" }
+  "post_id": 9,
+  "headline": "Hello World",
+  "body": "Your first post",
+  "author": {
+    "user_id": 1,
+    "name": "Post Author"
+  },
+  "comments": [
+    {
+      "comment_id": 1000,
+      "dates": {
+        "created_at": "2015-07-18T12:13:00+02:00",
+        "accepted_at": "2015-07-19T00:00:00+02:00"
+      },
+      "comment": "Have no fear, sers, your king is safe.",
+      "user": {
+        "user_id": 2,
+        "name": "Barristan Selmy"
+      }
     }
+  ],
+  "links": {
+    "self": {
+      "href": "http://example.com/posts/9"
+    },
+    "comments": {
+      "href": "http://example.com/posts/9/comments"
+    }
+  }
 }
 JSON;
+
 
         $this->assertEquals(
             json_decode($expected, true),
@@ -111,28 +109,7 @@ JSON;
 
     public function testItCanSerializeArrays()
     {
-        $mappings = [
-            [
-                'class' => Post::class,
-                'alias' => 'Message',
-                'aliased_properties' => [
-                    'title' => 'headline',
-                    'content' => 'body',
-                ],
-                'hide_properties' => [
-                    'comments',
-                ],
-                'id_properties' => [
-                    'postId',
-                ],
-                'urls' => [
-                    // Mandatory
-                    'self' => 'http://example.com/posts/{postId}',
-                    // Optional
-                    'comments' => 'http://example.com/posts/{postId}/comments',
-                ],
-            ],
-        ];
+        $mappings = $this->mappings();
 
         $expected = <<<JSON
 [
@@ -144,6 +121,20 @@ JSON;
       "user_id": 1,
       "name": "Post Author"
     },
+    "comments": [
+      {
+        "comment_id": 1000,
+        "dates": {
+          "created_at": "2015-07-18T12:13:00+02:00",
+          "accepted_at": "2015-07-19T00:00:00+02:00"
+        },
+        "comment": "Have no fear, sers, your king is safe.",
+        "user": {
+          "user_id": 2,
+          "name": "Barristan Selmy"
+        }
+      }
+    ],
     "links": {
       "self": {
         "href": "http://example.com/posts/9"
@@ -161,6 +152,20 @@ JSON;
       "user_id": 1,
       "name": "Post Author"
     },
+    "comments": [
+      {
+        "comment_id": 1000,
+        "dates": {
+          "created_at": "2015-07-18T12:13:00+02:00",
+          "accepted_at": "2015-07-19T00:00:00+02:00"
+        },
+        "comment": "Have no fear, sers, your king is safe.",
+        "user": {
+          "user_id": 2,
+          "name": "Barristan Selmy"
+        }
+      }
+    ],
     "links": {
       "self": {
         "href": "http://example.com/posts/9"
@@ -185,5 +190,73 @@ JSON;
         $serializer = (new JsonSerializer(new Mapper([])));
 
         $this->assertInstanceOf(JsonTransformer::class, $serializer->getTransformer());
+    }
+
+
+    /**
+     * @return array
+     */
+    protected function mappings()
+    {
+        return [
+            [
+                'class' => Post::class,
+                'alias' => 'Message',
+                'aliased_properties' => [
+                    'author' => 'author',
+                    'title' => 'headline',
+                    'content' => 'body',
+                ],
+                'hide_properties' => [
+                ],
+                'id_properties' => [
+                    'postId',
+                ],
+                'urls' => [
+                    // Mandatory
+                    'self' => 'http://example.com/posts/{postId}',
+                    // Optional
+                    'comments' => 'http://example.com/posts/{postId}/comments',
+                ],
+            ],
+            [
+                'class' => User::class,
+                'alias' => '',
+                'aliased_properties' => [],
+                'hide_properties' => [],
+                'id_properties' => [
+                    'userId',
+                ],
+                'urls' => [
+                    'self' => 'http://example.com/users/{userId}',
+                    'friends' => 'http://example.com/users/{userId}/friends',
+                    'comments' => 'http://example.com/users/{userId}/comments',
+                ],
+            ],
+            [
+                'class' => Comment::class,
+                'alias' => '',
+                'aliased_properties' => [],
+                'hide_properties' => [],
+                'id_properties' => [
+                    'commentId',
+                ],
+                'urls' => [
+                    'self' => 'http://example.com/comments/{commentId}',
+                ],
+            ],
+            [
+                'class' => CommentId::class,
+                'alias' => '',
+                'aliased_properties' => [],
+                'hide_properties' => [],
+                'id_properties' => [
+                    'commentId',
+                ],
+                'urls' => [
+                    'self' => 'http://example.com/comments/{commentId}',
+                ],
+            ],
+        ];
     }
 }

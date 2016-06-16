@@ -183,35 +183,35 @@ Content-type: application/json; charset=utf-8
 
 ```json
 {
-    "post_id": 9,
-    "headline": "Hello World",
-    "body": "Your first post",
-    "author": {
-        "user_id": 1,
-        "name": "Post Author"
-    },
-    "comments": [
-        {
-            "comment_id": 1000,
-            "dates": {
-                "created_at": "2015-07-18T12:13:00+00:00",
-                "accepted_at": "2015-07-19T00:00:00+00:00"
-            },
-            "comment": "Have no fear, sers, your king is safe.",
-            "user": {
-                "user_id": 2,
-                "name": "Barristan Selmy"
-            }
-        }
-    ],
-    "links": {
-        "comments": {
-            "href": "http://localhost:8000/post/9/comments"
-        },
-        "self": {
-            "href": "http://localhost:8000/post/9"
-        }        
+  "post_id": 9,
+  "headline": "Hello World",
+  "body": "Your first post",
+  "author": {
+    "user_id": 1,
+    "name": "Post Author"
+  },
+  "comments": [
+    {
+      "comment_id": 1000,
+      "dates": {
+        "created_at": "2015-07-18T12:13:00+02:00",
+        "accepted_at": "2015-07-19T00:00:00+02:00"
+      },
+      "comment": "Have no fear, sers, your king is safe.",
+      "user": {
+        "user_id": 2,
+        "name": "Barristan Selmy"
+      }
     }
+  ],
+  "links": {
+    "self": {
+      "href": "http://example.com/posts/9"
+    },
+    "comments": {
+      "href": "http://example.com/posts/9/comments"
+    }
+  }
 }
 ```
 
